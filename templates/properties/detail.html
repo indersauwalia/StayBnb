@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ property.title }} — Elsewhere{% endblock %}
+{% block content %}
+<div class="container detail-page">
+  <div class="detail-title"><div><p class="eyebrow">{{ property.get_property_type_display }} · {{ property.location }}</p><h1>{{ property.title }}</h1></div><div class="detail-hosted">A place by <strong>{{ property.host.first_name|default:property.host.username }}</strong><br><span>{{ property.host.profile.bio|default:"A thoughtful host, happy to have you." }}</span></div></div>
+  <div class="gallery {% if property.images.count == 1 %}gallery-single{% endif %}">
+    {% for image in property.images.all %}<img src="{{ image.image.url }}" alt="{{ image.caption|default:property.title }}" class="gallery-image gallery-image-{{ forloop.counter }}">
+    {% empty %}<img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1500&q=85" alt="{{ property.title }}" class="gallery-image gallery-image-1"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80" alt="Interior details" class="gallery-image gallery-image-2"><img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=800&q=80" alt="A quiet corner" class="gallery-image gallery-image-3">{% endfor %}
+  </div>
+  <div class="detail-layout">
+    <article class="detail-main"><div class="host-intro"><div class="avatar">{{ property.host.first_name|default:property.host.username|first|upper }}</div><div><strong>Hosted by {{ property.host.first_name|default:property.host.username }}</strong><span>Thoughtful spaces, personal touches</span></div></div>
+      <hr><h2>A little about the place</h2><p class="description">{{ property.description|linebreaksbr }}</p>
+      {% if property.amenity_list %}<h2>Small comforts</h2><div class="amenity-list">{% for amenity in property.amenity_list %}<span>✳ {{ amenity }}</span>{% endfor %}</div>{% endif %}
+      <section class="reviews-section"><h2>Notes from guests <span class="review-count">({{ property.reviews.count }})</span></h2>{% for review in property.reviews.all %}<article class="review"><div class="review-meta"><strong>{{ review.guest.first_name|default:review.guest.username }}</strong><span>★ {{ review.rating }} · {{ review.created_at|date:"M Y" }}</span></div><p>{{ review.comment }}</p></article>{% empty %}<p class="muted">No notes yet. Yours could be the first.</p>{% endfor %}{% if can_review %}<a class="text-link" href="{% url 'reviews:create' property.pk %}">Leave a note about your stay ↗</a>{% endif %}</section>
+    </article>
+    <aside class="booking-card"><div class="booking-price"><strong>₹{{ property.price_per_night|floatformat:0 }}</strong> <span>/ night</span></div><p>Good things are better when they’re planned.</p><a class="btn btn-dark w-100 rounded-pill py-3" href="{% url 'bookings:create' property.pk %}">Check availability <span>↗</span></a><small>You won’t be charged yet.</small>{% if user == property.host %}<div class="owner-actions"><a href="{% url 'properties:edit' property.pk %}">Edit this place</a><a href="{% url 'properties:delete' property.pk %}">Remove listing</a></div>{% endif %}</aside>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }} — Elsewhere{% endblock %}
+{% block content %}
+<div class="container narrow-page form-page"><p class="eyebrow">YOUR SPACE, YOUR STORY</p><h1>{{ heading }}</h1><p class="form-intro">The details make all the difference. Tell guests what makes this place feel like nowhere else.</p>
+<form method="post" enctype="multipart/form-data" class="surface-form" {% if property %}id="property-edit-form"{% endif %}>{% csrf_token %}{% include "components/form_fields.html" with form=form %}<div class="field-block"><label for="{{ image_form.images.id_for_label }}">Photos</label>{{ image_form.images }}<small>Choose a few images to bring the place to life. You can add more later.</small></div>
+<button class="btn btn-dark rounded-pill px-4 py-3 mt-3" type="submit">{% if property %}Save changes{% else %}Publish your place{% endif %} ↗</button></form></div>
+{% if property.images.all %}<div class="current-images"><span>Already on your listing · select photos to remove</span>{% for image in property.images.all %}<label class="image-remove"><img src="{{ image.image.url }}" alt="{{ image.caption|default:property.title }}"><span><input type="checkbox" name="delete_images" value="{{ image.pk }}" form="property-edit-form"> Remove</span></label>{% endfor %}</div>{% endif %}
+{% endblock %}
